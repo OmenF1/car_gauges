@@ -1,0 +1,4 @@
+dependencies:
+  idf: ">=4.4"
+  lvgl/lvgl: ~8.2.0
+  # espressif/esp-now: =2.5.0 <- moved to local components folder to fix build error.
