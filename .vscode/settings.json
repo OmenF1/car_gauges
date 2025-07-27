@@ -17,7 +17,8 @@
     "st7701s.h": "c",
     "esp_err.h": "c",
     "main_clock.h": "c",
-    "spi_master.h": "c"
+    "spi_master.h": "c",
+    "esp_now_lib.h": "c"
   },
   "idf.flashType": "UART",
   "idf.port": "/dev/ttyACM0"

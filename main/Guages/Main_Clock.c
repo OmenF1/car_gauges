@@ -1,86 +1,84 @@
 #include "Main_Clock.h"
 #include "lvgl.h"
+#include "esp_now_lib.h"
 
-
+lv_obj_t * units_indicator;
 lv_obj_t * speedo;
 lv_obj_t * rpm;
+lv_obj_t * fuel;
 lv_meter_indicator_t * indic;
 
-static void set_value(void * indic, int32_t v)
+
+static struct_cluster_message last_update = {0};
+LV_FONT_DECLARE(michroma_60);
+LV_FONT_DECLARE(michroma_32);
+
+
+void set_gauage_values(struct_cluster_message values) {
+    last_update = values;
+}
+
+
+void update_gauge_vals(lv_timer_t *timer) {
+
+    lv_meter_set_indicator_value(rpm, indic, last_update.rpm);
+    lv_label_set_text_fmt(speedo, "%d", (int)last_update.speed);
+}
+
+void create_outer_rpm_clock()
 {
-    lv_meter_set_indicator_value(rpm, indic, v);
-}
-
-static short last_rpm_value = 0;
-
-void set_rpm(short rpm_value) {
-    last_rpm_value = rpm_value;
-}
-
-
-static void set_speed(void * label, int32_t speed) {
-    lv_label_set_text_fmt(label, "%" PRId32 "\nkm/h", speed);
-}
-
-
-void rpm_anim_cb(lv_timer_t *timer) {
-
-    lv_meter_set_indicator_value(rpm, indic, last_rpm_value);
-}
-
-void add_main_clock() {
-// Meter start
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(),0);
+    // Meter start
     rpm = lv_meter_create(lv_scr_act());
+    lv_obj_set_style_radius(rpm, LV_RADIUS_CIRCLE, 0);
     lv_obj_center(rpm);
     lv_obj_set_size(rpm, 480, 480);
-        /*Add a scale first*/
+    /*Add a scale first*/
     lv_meter_scale_t * scale = lv_meter_add_scale(rpm);
-
     lv_obj_set_style_bg_color(rpm, lv_color_hex(0x4d4f52), 0);
     lv_meter_set_scale_range(rpm, scale, 0, 8000, 270, 135);
     lv_meter_set_scale_ticks(rpm, scale, 41, 2, 10, lv_palette_main(LV_PALETTE_DEEP_ORANGE));
     lv_meter_set_scale_major_ticks(rpm, scale, 5, 4, 20, lv_palette_main(LV_PALETTE_DEEP_ORANGE), 0);
-lv_obj_set_style_text_color(rpm, lv_color_white(), LV_PART_TICKS);
+    lv_obj_set_style_text_color(rpm, lv_color_white(), LV_PART_TICKS);
+    
+
     
 
     /*Add a needle line indicator*/
-    indic = lv_meter_add_needle_line(rpm, scale, 8, lv_palette_main(LV_PALETTE_RED), 0);
+    indic = lv_meter_add_needle_line(rpm, scale, 8, lv_color_white(), 0);
+}
 
+void create_center_clock()
+{
     lv_obj_t *inner_circle = lv_obj_create(rpm);
-lv_obj_set_size(inner_circle, 230, 230);  // Adjust size for your design
-lv_obj_center(inner_circle);
-lv_obj_set_style_bg_color(inner_circle, lv_color_black(), 0);
-lv_obj_set_style_radius(inner_circle, LV_RADIUS_CIRCLE, 0);
-lv_obj_set_style_border_width(inner_circle, 0, 0);
-speedo = lv_label_create(inner_circle);
-lv_label_set_text_fmt(speedo, "0\nkm/h");
-lv_obj_set_style_text_align(speedo, LV_TEXT_ALIGN_CENTER, 0);
-lv_obj_set_style_text_color(speedo, lv_color_white(), LV_PART_MAIN);
-lv_obj_center(speedo);
-lv_timer_create(rpm_anim_cb, 16, NULL);
+    lv_obj_set_size(inner_circle, 240, 240);  // Adjust size for your design
+    lv_obj_center(inner_circle);
+    lv_obj_set_style_bg_color(inner_circle, lv_color_black(), 0);
+    lv_obj_set_style_radius(inner_circle, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_border_width(inner_circle, 0, 0);
 
-    /*Create an animation to set the value*/
-    // lv_anim_t a;
-    // lv_anim_init(&a);
-    // lv_anim_set_exec_cb(&a, set_value);
-    // lv_anim_set_var(&a, indic);
-    // lv_anim_set_values(&a, 0, 8000);
-    // lv_anim_set_time(&a, 2000);
-    // lv_anim_set_repeat_delay(&a, 100);
-    // lv_anim_set_playback_time(&a, 500);
-    // lv_anim_set_playback_delay(&a, 100);
-    // lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    // lv_anim_start(&a);
+    speedo = lv_label_create(inner_circle);
+    units_indicator = lv_label_create(inner_circle);
+    
+    lv_obj_set_style_text_font(speedo, &michroma_60, LV_PART_MAIN);
+    lv_label_set_text_fmt(speedo, "0");
+    lv_obj_center(speedo);
+    lv_obj_set_style_text_align(speedo, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_style_text_color(speedo, lv_color_white(), LV_PART_MAIN);
 
-    //     lv_anim_t b;
-    // lv_anim_init(&b);
-    // lv_anim_set_exec_cb(&b, set_speed);
-    // lv_anim_set_var(&b, speedo);
-    // lv_anim_set_values(&b, 0, 280);
-    // lv_anim_set_time(&b, 2000);
-    // lv_anim_set_repeat_delay(&b, 100);
-    // lv_anim_set_playback_time(&b, 500);
-    // lv_anim_set_playback_delay(&b, 100);
-    // lv_anim_set_repeat_count(&b, LV_ANIM_REPEAT_INFINITE);
-    // lv_anim_start(&b);
+    lv_label_set_text_fmt(units_indicator, "km/h");
+    lv_obj_set_style_text_font(units_indicator, &michroma_32, LV_PART_MAIN);
+    lv_obj_set_style_text_color(units_indicator, lv_color_white(), LV_PART_MAIN);
+    // lv_obj_align(units_indicator, LV_ALIGN_OUT_BOTTOM_MID, 0, 0); 
+    lv_obj_align_to(units_indicator, speedo, LV_ALIGN_OUT_BOTTOM_MID, 0, 5);
+
+
+    lv_timer_create(update_gauge_vals, 16, NULL);
+}
+
+
+
+void create_main_clock() {
+    create_outer_rpm_clock();
+    create_center_clock();
 }

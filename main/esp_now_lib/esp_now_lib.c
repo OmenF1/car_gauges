@@ -6,17 +6,11 @@
 
 static const char *TAG = "esp-now-lib";
 
-
-
-typedef struct struct_message {
-    short a;
-} struct_message;
-
-struct_message message;
+struct_cluster_message message;
 
 void on_data_receive(const esp_now_recv_info_t *mac, const uint8_t *data, int len) {
   memcpy(&message, data, sizeof(message));
-  set_rpm(message.a);
+  set_gauage_values(message);
 }
 
 
