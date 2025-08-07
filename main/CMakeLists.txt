@@ -5,6 +5,7 @@ idf_component_register(
                               "Touch/esp_lcd_touch/esp_lcd_touch.c" 
                               "TCA9554PWR/TCA9554PWR.c"
                               "Guages/Main_Clock.c"
+                              "Guages/Secondary_Clock.c"
                               "esp_now_lib/esp_now_lib.c"
                               "wifi_lib/wifi_lib.c"
                               "Fonts/michroma_24.c"
