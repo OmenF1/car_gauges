@@ -7,9 +7,14 @@ idf_component_register(
                               "Guages/Main_Clock.c"
                               "esp_now_lib/esp_now_lib.c"
                               "wifi_lib/wifi_lib.c"
+                              "Fonts/michroma_24.c"
+                              "Fonts/michroma_28.c"
                               "Fonts/michroma_32.c"
                               "Fonts/michroma_48.c"
                               "Fonts/michroma_60.c"
+                              "Fonts/michroma_72.c"
+                              "Fonts/michroma_80.c"
+                              "Icons/petrol_icon.c"
 
                         INCLUDE_DIRS "./LCD_Driver"
                                      "./Touch" 
@@ -19,5 +24,6 @@ idf_component_register(
                                      "esp_now_lib"
                                      "wifi_lib"
                                      "Fonts"
+                                     "Icons"
                                      "."
                         )

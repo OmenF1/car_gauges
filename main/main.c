@@ -181,16 +181,6 @@ void app_main(void)
     assert(sem_gui_ready);
 #endif
 
-// #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
-//     ESP_LOGI(TAG, "Turn off LCD backlight");
-//     gpio_config_t bk_gpio_config = {
-//         .mode = GPIO_MODE_OUTPUT,
-//         .pin_bit_mask = 1ULL << EXAMPLE_PIN_NUM_BK_LIGHT
-//     };
-//     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
-// #endif
-
-    
 /********************* RGB LCD panel driver *********************/
     ESP_LOGI(TAG, "Install RGB LCD panel driver");
     esp_lcd_panel_handle_t panel_handle = NULL;
@@ -297,7 +287,7 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
 
 
-
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(),0);
     create_main_clock();
     init_master_wifi();
     init_esp_now();
